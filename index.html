@@ -1,0 +1,641 @@
+```html
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UzHuquqTest 2.0</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #eef2f7;
+    color: #172033;
+}
+
+header {
+    background: linear-gradient(135deg, #071b35, #123e6b);
+    color: white;
+    text-align: center;
+    padding: 45px 20px;
+}
+
+header h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 17px;
+    opacity: .9;
+}
+
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 18px;
+}
+
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,.08);
+}
+
+.home {
+    text-align: center;
+}
+
+.home h2 {
+    margin-bottom: 12px;
+}
+
+.btn {
+    border: none;
+    border-radius: 12px;
+    padding: 15px 22px;
+    margin-top: 15px;
+    background: #0b2b50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #174d80;
+}
+
+.hidden {
+    display: none;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 15px;
+    border-radius: 12px;
+    background: #edf3f9;
+}
+
+.timer {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.progress {
+    margin-top: 8px;
+    color: #667085;
+}
+
+.question {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.option {
+    width: 100%;
+    text-align: left;
+    padding: 15px;
+    margin: 8px 0;
+    border: 2px solid #e1e7ef;
+    background: white;
+    color: #172033;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.option:hover {
+    background: #f0f5fa;
+}
+
+.option.correct {
+    background: #dff7e7;
+    border-color: #31a05a;
+}
+
+.option.wrong {
+    background: #ffe2e2;
+    border-color: #d9534f;
+}
+
+.result {
+    text-align: center;
+}
+
+.score {
+    font-size: 50px;
+    font-weight: bold;
+    margin: 20px;
+}
+
+.source {
+    margin-top: 20px;
+    padding: 12px;
+    background: #f3f6fa;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #596579;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #667085;
+}
+
+@media(max-width:600px) {
+    header h1 {
+        font-size: 30px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .question {
+        font-size: 19px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>⚖️ UzHuquqTest</h1>
+    <p>Huquq va Konstitutsiyani o‘rganish platformasi</p>
+</header>
+
+<div class="container">
+
+    <!-- HOME -->
+    <div class="card home" id="home">
+        <h2>🇺🇿 Xush kelibsiz!</h2>
+
+        <p>
+            O‘zbekiston huquqi bo‘yicha bilimingizni sinab ko‘ring.
+            20 ta savolga javob bering.
+        </p>
+
+        <button class="btn" onclick="startTest()">
+            🚀 Testni boshlash
+        </button>
+    </div>
+
+    <!-- TEST -->
+    <div class="card hidden" id="testBox">
+
+        <div class="topbar">
+            <div>
+                <b>⚖️ Huquq testi</b>
+                <div class="progress" id="progress"></div>
+            </div>
+
+            <div class="timer" id="timer">
+                10:00
+            </div>
+        </div>
+
+        <div id="questionBox"></div>
+
+        <button class="btn" onclick="nextQuestion()" id="nextBtn">
+            Keyingi →
+        </button>
+
+    </div>
+
+    <!-- RESULT -->
+    <div class="card result hidden" id="resultBox">
+
+        <h2>🏆 Test yakunlandi!</h2>
+
+        <div class="score" id="score"></div>
+
+        <p id="resultText"></p>
+
+        <button class="btn" onclick="restartTest()">
+            🔄 Qayta ishlash
+        </button>
+
+        <div class="source">
+            📚 Savollar amaldagi qonunchilikka asoslangan.
+            Qonunchilik o‘zgarishi mumkin, shuning uchun test bazasi
+            vaqti-vaqti bilan yangilanadi.
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    ✍️ Muallif: Bunyodbek O‘ralov
+</footer>
+
+
+<script>
+
+const questions = [
+
+{
+    q: "O‘zbekiston Respublikasining Konstitutsiyasi qanday yuridik kuchga ega?",
+    options: [
+        "Oddiy qonun bilan teng",
+        "Oliy yuridik kuchga ega",
+        "Faqat tavsiyaviy kuchga ega",
+        "Faqat sudlarda qo‘llanadi"
+    ],
+    answer: 1
+},
+
+{
+    q: "O‘zbekiston Respublikasi Konstitutsiyasining yangi tahriri qachon referendum orqali qabul qilingan?",
+    options: [
+        "1991-yil 31-avgust",
+        "1992-yil 8-dekabr",
+        "2023-yil 30-aprel",
+        "2024-yil 1-yanvar"
+    ],
+    answer: 2
+},
+
+{
+    q: "O‘zbekiston Respublikasi qanday davlat?",
+    options: [
+        "Monarxiya",
+        "Respublika",
+        "Imperiya",
+        "Konfederatsiya"
+    ],
+    answer: 1
+},
+
+{
+    q: "O‘zbekiston Respublikasining davlat tili qaysi?",
+    options: [
+        "Rus tili",
+        "Ingliz tili",
+        "O‘zbek tili",
+        "Qoraqalpoq tili"
+    ],
+    answer: 2
+},
+
+{
+    q: "O‘zbekiston Respublikasining davlat ramzlari nimalardan iborat?",
+    options: [
+        "Bayroq, gerb va madhiyadan",
+        "Faqat bayroqdan",
+        "Bayroq va gerbdan",
+        "Faqat madhiyadan"
+    ],
+    answer: 0
+},
+
+{
+    q: "Fuqarolarning qonun oldida tengligi nimani anglatadi?",
+    options: [
+        "Ayrim fuqarolar qonundan ustun turadi",
+        "Barcha fuqarolar qonun oldida tengdir",
+        "Faqat mansabdorlar teng",
+        "Faqat voyaga yetganlar teng"
+    ],
+    answer: 1
+},
+
+{
+    q: "O‘zbekiston Respublikasida davlat hokimiyatining birdan-bir manbai kim?",
+    options: [
+        "Prezident",
+        "Parlament",
+        "Xalq",
+        "Hukumat"
+    ],
+    answer: 2
+},
+
+{
+    q: "Konstitutsiya va qonunlarning ustunligi nimani anglatadi?",
+    options: [
+        "Qonunlarga rioya qilish majburiy emas",
+        "Konstitutsiya va qonunlarning ustuvorligi tan olinadi",
+        "Faqat davlat organlari qonunga amal qiladi",
+        "Faqat sudlar qonunga amal qiladi"
+    ],
+    answer: 1
+},
+
+{
+    q: "Normativ-huquqiy hujjatlar Konstitutsiyaga zid bo‘lishi mumkinmi?",
+    options: [
+        "Ha, har doim mumkin",
+        "Faqat mansabdor xohlasa",
+        "Yo‘q",
+        "Faqat mahalliy hududlarda mumkin"
+    ],
+    answer: 2
+},
+
+{
+    q: "Inson huquqlari va erkinliklari nimaga ko‘ra ta’minlanadi?",
+    options: [
+        "Konstitutsiya va qonunlarga muvofiq",
+        "Faqat og‘zaki kelishuvga ko‘ra",
+        "Faqat maktab qaroriga ko‘ra",
+        "Faqat mahalla qaroriga ko‘ra"
+    ],
+    answer: 0
+},
+
+{
+    q: "Fuqarolarning asosiy huquqlaridan biri qaysi?",
+    options: [
+        "Ta’lim olish huquqi",
+        "Qonunni buzish huquqi",
+        "Boshqalarning huquqini cheklash",
+        "Sud qarorini bajarmaslik"
+    ],
+    answer: 0
+},
+
+{
+    q: "Har bir shaxsning huquq va erkinliklari kim tomonidan kafolatlanadi?",
+    options: [
+        "Faqat do‘stlari tomonidan",
+        "Davlat tomonidan",
+        "Faqat maktab tomonidan",
+        "Faqat mahalla tomonidan"
+    ],
+    answer: 1
+},
+
+{
+    q: "O‘zbekiston Respublikasi Prezidenti davlat boshlig‘i hisoblanadimi?",
+    options: [
+        "Ha",
+        "Yo‘q",
+        "Faqat ayrim hollarda",
+        "Faqat parlament rahbari sifatida"
+    ],
+    answer: 0
+},
+
+{
+    q: "O‘zbekiston Respublikasi Oliy Majlisi qanday organ?",
+    options: [
+        "Oliy davlat vakillik organi",
+        "Faqat sud organi",
+        "Faqat ijro organi",
+        "Faqat mahalliy organ"
+    ],
+    answer: 0
+},
+
+{
+    q: "Oliy Majlis nechta palatadan iborat?",
+    options: [
+        "Bitta",
+        "Ikki",
+        "Uch",
+        "To‘rt"
+    ],
+    answer: 1
+},
+
+{
+    q: "O‘zbekiston Respublikasida odil sudlovni kim amalga oshiradi?",
+    options: [
+        "Sud",
+        "Maktab",
+        "Mahalla",
+        "Bank"
+    ],
+    answer: 0
+},
+
+{
+    q: "Qonunlarga rioya qilish kimning burchidir?",
+    options: [
+        "Faqat davlat xizmatchilarining",
+        "Faqat sudyalarning",
+        "Har bir fuqaroning",
+        "Faqat deputatlarning"
+    ],
+    answer: 2
+},
+
+{
+    q: "Ta’lim olish insonning qanday huquqi?",
+    options: [
+        "Asosiy huquqlardan biri",
+        "Faqat majburiyat",
+        "Faqat davlat xizmatchilariga beriladi",
+        "Huquq hisoblanmaydi"
+    ],
+    answer: 0
+},
+
+{
+    q: "Huquqiy davlatning muhim belgilaridan biri nima?",
+    options: [
+        "Qonun ustuvorligi",
+        "Qonunsizlik",
+        "Faqat kuch ishlatish",
+        "Qonunlarni bajarmaslik"
+    ],
+    answer: 0
+},
+
+{
+    q: "Konstitutsiya normalari qanday ahamiyatga ega?",
+    options: [
+        "Huquqiy tizimning asosini tashkil etadi",
+        "Faqat tarixiy ma’lumot hisoblanadi",
+        "Faqat maktablarda qo‘llanadi",
+        "Faqat davlat bayramlarida ishlatiladi"
+    ],
+    answer: 0
+}
+
+];
+
+let current = 0;
+let score = 0;
+let timeLeft = 600;
+let timerInterval;
+let selected = false;
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function startTest() {
+
+    current = 0;
+    score = 0;
+    timeLeft = 600;
+
+    shuffle(questions);
+
+    document.getElementById("home").classList.add("hidden");
+    document.getElementById("resultBox").classList.add("hidden");
+    document.getElementById("testBox").classList.remove("hidden");
+
+    clearInterval(timerInterval);
+
+    timerInterval = setInterval(updateTimer, 1000);
+
+    showQuestion();
+}
+
+function updateTimer() {
+
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+
+    document.getElementById("timer").textContent =
+        String(minutes).padStart(2, "0") +
+        ":" +
+        String(seconds).padStart(2, "0");
+
+    if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        finishTest();
+    }
+
+    timeLeft--;
+}
+
+function showQuestion() {
+
+    selected = false;
+
+    const q = questions[current];
+
+    document.getElementById("progress").textContent =
+        `Savol ${current + 1} / ${questions.length}`;
+
+    let html = `
+        <div class="question">
+            ${q.q}
+        </div>
+    `;
+
+    q.options.forEach((option, index) => {
+
+        html += `
+            <button
+                class="option"
+                onclick="selectAnswer(${index})"
+                id="option${index}">
+                ${String.fromCharCode(65 + index)}) ${option}
+            </button>
+        `;
+
+    });
+
+    document.getElementById("questionBox").innerHTML = html;
+
+    document.getElementById("nextBtn").style.display = "none";
+}
+
+function selectAnswer(index) {
+
+    if (selected) return;
+
+    selected = true;
+
+    const q = questions[current];
+
+    if (index === q.answer) {
+
+        score++;
+
+        document
+            .getElementById("option" + index)
+            .classList.add("correct");
+
+    } else {
+
+        document
+            .getElementById("option" + index)
+            .classList.add("wrong");
+
+        document
+            .getElementById("option" + q.answer)
+            .classList.add("correct");
+    }
+
+    document.getElementById("nextBtn").style.display = "block";
+}
+
+function nextQuestion() {
+
+    if (!selected) return;
+
+    current++;
+
+    if (current >= questions.length) {
+        finishTest();
+        return;
+    }
+
+    showQuestion();
+}
+
+function finishTest() {
+
+    clearInterval(timerInterval);
+
+    document.getElementById("testBox").classList.add("hidden");
+    document.getElementById("resultBox").classList.remove("hidden");
+
+    const percent =
+        Math.round((score / questions.length) * 100);
+
+    document.getElementById("score").textContent =
+        `${score} / ${questions.length}`;
+
+    let text = "";
+
+    if (percent >= 90) {
+        text = "🏆 A’lo natija! Huquq bo‘yicha bilimingiz juda yaxshi.";
+    } else if (percent >= 70) {
+        text = "🥇 Yaxshi natija! Yana mashq qilsangiz yanada kuchli bo‘lasiz.";
+    } else if (percent >= 50) {
+        text = "📚 Yomon emas. Bilimingizni yana mustahkamlang.";
+    } else {
+        text = "💪 Ko‘proq o‘qing va qayta urinib ko‘ring!";
+    }
+
+    document.getElementById("resultText").innerHTML =
+        `${percent}%<br><br>${text}`;
+}
+
+function restartTest() {
+
+    document.getElementById("resultBox").classList.add("hidden");
+    document.getElementById("home").classList.remove("hidden");
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+</script>
+
+</body>
+</html>
+```
